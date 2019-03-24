@@ -1,0 +1,103 @@
+MATRICULATION NUMBER: S1709906
+
+Part 1:
+
+
+Describing World State (10%)
+
+1.1: Define the predicates you will use to describe the map. Specifically, how will you establish that one location is Adjacent to another?
+Adjacent(x,y) - true if and only if x is adjacent to y and vice versa, and x and y are locations
+
+1.2: Define how you will keep track of the Location that the agent, plate, or customer is At.
+At(x,y) - true if and only if is x is at y, and where x is an agent, plate or customer, and y is a Location.
+
+1.3: Define the predicates you will need to model a Plate and, in particular, whether or not it Has Food.
+HasFood(p) - true if and only if p has food, and where p is a Plate.
+
+1.4: Define the predicates you will need to model a Customer, and whether or not that customer has been Served.
+IsServed(c) - true if and only if c has been served, and where c is a Customer.
+ 
+1.5: Using the symbols you just defined and the map as depicted in Figure 1, describe the following initial state of the problem:
+- the map is as depicted in Figure 1: Adjacent(UB,UF) ∧ Adjacent(BUFF,UF) ∧ Adjacent(UF,MF) ∧ Adjacent(MF,LF) ∧ Adjacent(LB,MB) ∧ Adjacent(UB,MB) ∧ Adjacent(LB,LF)
+- the agent starts off at BUFF: At(agent,BUFF)
+- there is a plate at BUFF: At(plate,BUFF)
+- there is a single customer at LB: At(customer,LB)
+
+
+Actions (15%)
+
+1.6: The agent can Pick Up a plate. Note an agent can only hold one plate at a time, so if it is currently Holding a plate, it will be unable to pick up another.
+Action: PickUp
+Parameters: ?p - plate ?loc - location
+Description: The agent can pick up a plate
+Precondition: ¬Holding(p) ∧ ¬HasFood(p) ∧ At(agent,loc) ∧ At(p,loc)
+Effect: Holding(p)
+
+1.7: The agent can Hand Over a plate of food to a customer that is in the same location as the agent, after which a customer should be said to be Served.
+Action: HandOver
+Parameters: ?p - plate ?loc - location ?c - customer
+Description: The agent hand over a plate p to a customer c at location loc
+Precondition: At(c,loc) ∧ At(agent,loc) ∧ Holding(p) ∧ HasFood(p) ∧ ¬IsServed(c)
+Effect: ¬Holding(p) ∧ IsServed(c)
+
+1.8: At the BUFF, the agent can Fill a plate with food that it is Holding if the plate does not already Have Food.
+Action: Fill
+Parameters: ?p - plate 
+Description: The agent fills plate p with food 
+Precondition: At(agent,BUFF) ∧ ¬HasFood(p) ∧ Holding(p)
+Effect: HasFood(p)
+
+1.9: The agent can Move from its current location to an Adjacent one.
+Action: Move
+Parameters: ?currloc - location ?newloc - location
+Description: The agent moves from current location currloc to new location newloc (if and only if currloc and newloc are adjacent).
+Precondition: At(agent,currloc) ∧ Adjacent(currloc,newloc)
+Effect: At(agent,newloc) ∧ ¬At(agent,currloc)
+
+
+Backward State Space Search (15%)
+
+1.10
+
+Formalize the following initial and goal states using the predicates you developed in the previous sections
+- Initial State: The agent is at BUFF, there is one empty plate P at the BUFF, and there is a customer C who hasn't yet been served at UF.
+	At(agent,BUFF) ∧ At(P,BUFF) ∧ ¬HasFood(P) ∧ At(C,UF) ∧ ¬IsServed(C) ∧ ¬Holding(P) ∧ Adjacent(BUFF,UF)
+- Goal State: The customer C has been served.
+	IsServed(C)
+
+Then, using Backwards State-Space Search, provide a plan which works backwards from the gaol state towards the initial state.
+Show in your working:
+- The relevant (as opposed to applicable in Forward State-Space Search) actions available at each step
+- The current updated goal state at each stage of the search
+- The final plan executed
+
+-- Forward: PickUp, Fill, Move, HandOver
+
+Goal State: IsServed(C)
+
+1.	Action: HandOver(C,UF)
+	Precondition: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
+	Effect: ¬Holding(P) ∧ IsServed(C)
+	UpdatedGoal: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
+
+2.	Action: Move(BUFF,UF)
+	Precondition: At(agent,BUFF) ∧ Adjacent(BUFF,UF)
+	Effect: At(agent,UF) ∧ ¬At(agent,BUFF)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C)
+
+3.	Action: Fill(P)
+	Precondition: At(agent,BUFF) ∧ ¬HasFood(P) ∧ Holding(P) ∧ At(P,BUFF)
+	Effect: HasFood(P)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
+
+4.	Action: PickUp(P)
+	Precondition: ¬Holding(P) ∧ ¬HasFood(P) ∧ At(agent,BUFF) ∧ At(P,BUFF)
+	Effect: Holding(P)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ ¬Holding(P) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
+
+	
+
+Part 4:
+4.1
+4.2
+
