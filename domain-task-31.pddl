@@ -22,22 +22,23 @@
         
         ; Additional predicate
         (BrokenPlate ?loc - location)
+        (DroppedFood ?loc - location)
     )
     
     
     ;;;; ACTIONS
     
-    (:action PickUp
-        :parameters (?a - waiter ?p - plate ?loc - location)
+    (:action PickUp ; changed so can pick up broom
+        :parameters (?a - waiter ?x - item ?loc - location)
         :precondition (and 
-            (not (Holding ?p))
+            (not (Holding ?x))
             (not (IsHolding ?a))
-            (not (HasFood ?p))
-            (At ?p ?loc)
+            (not (HasFood ?x))
+            (At ?x ?loc)
             (At Agent ?loc)
         )
         :effect (and 
-            (Holding ?p)
+            (Holding ?x)
             (IsHolding ?a)
         )
     )
@@ -76,8 +77,10 @@
             (At Agent ?currloc)
             (Adjacent ?currloc ?newloc)
             
-            ; The agent cannot Move into an area if it contains Broken Plate
-            (not (BrokenPlate ?newloc)) 
+            ; The agent cannot Move into an area if it contains Broken Plate or Dropped Food
+            (not (BrokenPlate ?newloc))
+            (not (DroppedFood ?newloc))
+
         )
         :effect (and 
             (At Agent ?newloc)
@@ -96,10 +99,13 @@
             ; Agent must be holding a broom
             (Holding ?b)
             
-            ; There must be a broken plate at the target location
-            (BrokenPlate ?y)
+            ; There must be a broken plate or dropped food at the target location
+            (or (BrokenPlate ?y) (DroppedFood ?y))
         )
-        :effect (not(BrokenPlate ?y))
+        :effect (and 
+            (not (BrokenPlate ?y))
+            (not (DroppedFood ?y))
+        )
     )
     
     ; The agent cannot hold a plate and the broom at the same time, so must Put Down one item 
