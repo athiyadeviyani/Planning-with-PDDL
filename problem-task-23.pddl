@@ -1,7 +1,7 @@
 ﻿(define (problem waiting-23) ;; Replace XX with task number
     (:domain waiting)
     (:objects 
-        a - waiter
+
         c1 - customer 
         c2 - customer 
         p1 - plate 
@@ -17,7 +17,7 @@
     
     (:init
         ; The agent starts at MF
-        (At a MF)
+        (At Agent MF)
         
         ; There is one empty plate at MB and another at LB 
         (At p1 MB)
@@ -50,7 +50,7 @@
         (and 
             (IsServed c1)
             (IsServed c2)
-            (At a BUFF)
+            (At Agent BUFF)
         )
     )
 )

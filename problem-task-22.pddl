@@ -1,7 +1,6 @@
 ﻿(define (problem waiting-22) ;; Replace XX with task number
     (:domain waiting)
     (:objects 
-        a - waiter
         c - customer
         p - plate
         BUFF - location
@@ -15,7 +14,7 @@
     
     (:init
 	; The agent starts at BUFF
-        (At a BUFF)
+        (At Agent BUFF)
 
 	; There is an empty plate at BUFF
         (At p BUFF)
