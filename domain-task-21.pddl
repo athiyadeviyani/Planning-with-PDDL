@@ -2,7 +2,9 @@
     (:requirements :adl )
     
     (:types
-        waiter customer plate - item
+        waiter
+        customer
+        plate
         location
     )
     
@@ -13,7 +15,7 @@
     
     (:predicates
         (Adjacent ?x - location ?y - location)
-        (At ?x - item ?y - location)
+        (At ?x - object ?y - location)
         (HasFood ?p - plate)
         (IsServed ?c - customer)
         (Holding ?p - plate)

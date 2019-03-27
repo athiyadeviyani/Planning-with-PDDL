@@ -1,4 +1,4 @@
-﻿(define (problem waiting-22) ;; Replace XX with task number
+﻿(define (problem waiting-22)
     (:domain waiting)
     (:objects 
         c - customer

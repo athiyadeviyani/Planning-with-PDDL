@@ -1,13 +1,14 @@
-﻿(define (problem waiting-32) ;; Replace XX with task number
+﻿(define (problem waiting-32)
     (:domain waiting)
     (:objects 
     
         c - customer 
         p - plate 
         b - broom 
+
         
         ; Locations
-        BUFF - location
+        
         UB - location 
         UF - location 
         MB - location 
@@ -67,7 +68,8 @@
         (At Agent BUFF)
         
         ; There is not any rubbish on any part of the floor 
-        (forall (?loc - location) (and (not (BrokenPlate ?loc)) (not (DroppedFood ?loc))))
+        (forall (?loc - location) (not(BrokenPlate ?loc)))
+        (forall (?loc - location) (not(DroppedFood ?loc)))
         
     ))
 )

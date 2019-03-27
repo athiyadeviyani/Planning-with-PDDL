@@ -2,8 +2,11 @@
     (:requirements :adl )
     
     (:types
-        ; add broom as an item
-        waiter customer plate broom - item
+        waiter 
+        customer 
+        plate 
+        broom ; added broom to sweep
+        food ; added food, for dropped food
         location
     )
     
@@ -14,26 +17,26 @@
     
     (:predicates
         (Adjacent ?x - location ?y - location)
-        (At ?x - item ?y - location)
+        (At ?x - object ?y - location)
         (HasFood ?p - plate)
         (IsServed ?c - customer)
-        (Holding ?x - item) ; changed Holding parameter from 'plate' to 'item' so a 'broom' can be held
+        (Holding ?x - object) ; changed Holding parameter from 'plate' to 'object' so a 'broom' can be held
         (IsHolding ?a - waiter)
         
         ; Additional predicate
-        (BrokenPlate ?loc - location)
-        (DroppedFood ?loc - location)
+        (BrokenPlate ?loc)
+        (DroppedFood ?loc)
     )
     
     
     ;;;; ACTIONS
     
     (:action PickUp ; changed so can pick up broom
-        :parameters (?a - waiter ?x - item ?loc - location)
+        :parameters (?a - waiter ?x - object ?loc - location)
         :precondition (and 
-            (not (Holding ?x))
+          ;  (not (Holding ?x)) can put down
             (not (IsHolding ?a))
-            (not (HasFood ?x))
+           ; (not (HasFood ?x))
             (At ?x ?loc)
             (At Agent ?loc)
         )
@@ -77,9 +80,9 @@
             (At Agent ?currloc)
             (Adjacent ?currloc ?newloc)
             
-            ; The agent cannot Move into an area if it contains Broken Plate or Dropped Food
+            ; The agent cannot Move into an area if it contains Broken Plate
             (not (BrokenPlate ?newloc))
-            (not (DroppedFood ?newloc))
+
 
         )
         :effect (and 
@@ -90,7 +93,7 @@
     
     ; The agent can remove broken plates and dropped food from an area by Sweeping it Up
     (:action SweepUp
-        :parameters (?x - location ?y - location ?b - broom)
+        :parameters (?a - waiter ?x - location ?y - location ?b - broom )
         :precondition (and 
             ; Agent must be At an adjacent location to the rubbish
             (At Agent ?x)
@@ -98,20 +101,21 @@
             
             ; Agent must be holding a broom
             (Holding ?b)
+            (IsHolding ?a)
             
             ; There must be a broken plate or dropped food at the target location
             (or (BrokenPlate ?y) (DroppedFood ?y))
         )
         :effect (and 
-            (not (BrokenPlate ?y))
             (not (DroppedFood ?y))
+            (not (BrokenPlate ?y))
         )
     )
     
     ; The agent cannot hold a plate and the broom at the same time, so must Put Down one item 
     ; to Pick Up the other
     (:action PutDown
-        :parameters (?a - waiter ?x - item ?loc - location)
+        :parameters (?a - waiter ?x - object ?loc - location)
         :precondition (and 
             (Holding ?x)
             (IsHolding ?a)
@@ -119,24 +123,10 @@
         )
         :effect (and 
             (At ?x ?loc)
-            (not (Holding ?x))
             (not (IsHolding ?a))
+            (not (Holding ?x))
+            
         )
     )
     
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
