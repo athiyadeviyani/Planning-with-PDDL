@@ -26,50 +26,50 @@
     ;;;; ACTIONS
     
     (:action PickUp
-        :parameters (?a - waiter ?p - plate ?loc - location)
+        :parameters (?p - plate ?loc - location)
         :precondition (and 
             (not (Holding ?p))
-            (not (IsHolding ?a))
+            (not (IsHolding Agent))
             (not (HasFood ?p))
             (At ?p ?loc)
             (At Agent ?loc)
         )
         :effect (and 
             (Holding ?p)
-            (IsHolding ?a)
+            (IsHolding Agent)
         )
     )
     
     (:action HandOver
-        :parameters (?p - plate ?loc - location ?a - waiter ?c - customer)
+        :parameters (?p - plate ?loc - location ?c - customer)
         :precondition (and
             (At ?c ?loc)
             (At Agent ?loc)
             (Holding ?p)
-            (IsHolding ?a)
+            (IsHolding Agent)
             (HasFood ?p)
             (not (IsServed ?c))
         )
         :effect (and
             (not (Holding ?p))
-            (not (IsHolding ?a))
+            (not (IsHolding Agent))
             (IsServed ?c)
         )
     )
     
     (:action Fill
-        :parameters (?a - waiter ?p - plate)
+        :parameters (?p - plate)
         :precondition (and 
             (At Agent BUFF)
             (not (HasFood ?p))
             (Holding ?p)
-            (IsHolding ?a)
+            (IsHolding Agent)
         )
         :effect (HasFood ?p)
     )
     
     (:action Move 
-        :parameters (?a - waiter ?currloc - location ?newloc - location)
+        :parameters (?currloc - location ?newloc - location)
         :precondition (and
             (At Agent ?currloc)
             (Adjacent ?currloc ?newloc)
