@@ -1,12 +1,17 @@
-MATRICULATION NUMBER: S1709906
+-------------------------------
+
+INF2D			: REASONING AND AGENTS
+COURSEWORK 2		: PLANNING WITH PDDL
+MATRICULATION NUMBER	: S1709906
+
+-------------------------------
 
 Part 1:
-
 
 Describing World State (10%)
 
 1.1: Define the predicates you will use to describe the map. Specifically, how will you establish that one location is Adjacent to another?
-Adjacent(x,y) - true if and only if x is adjacent to y and vice versa, and x and y are locations
+Adjacent(x,y) - true if and only if x is adjacent to y, and x and y are locations
 
 1.2: Define how you will keep track of the Location that the agent, plate, or customer is At.
 At(x,y) - true if and only if is x is at y, and where x is an agent, plate or customer, and y is a Location.
@@ -18,7 +23,7 @@ HasFood(p) - true if and only if p has food, and where p is a Plate.
 IsServed(c) - true if and only if c has been served, and where c is a Customer.
  
 1.5: Using the symbols you just defined and the map as depicted in Figure 1, describe the following initial state of the problem:
-- the map is as depicted in Figure 1: Adjacent(UB,UF) ∧ Adjacent(BUFF,UF) ∧ Adjacent(UF,MF) ∧ Adjacent(MF,LF) ∧ Adjacent(LB,MB) ∧ Adjacent(UB,MB) ∧ Adjacent(LB,LF)
+- the map is as depicted in Figure 1: Adjacent(UB,UF) ∧ Adjacent(BUFF,UF) ∧ Adjacent(UF,MF) ∧ Adjacent(MF,LF) ∧ Adjacent(LB,MB) ∧ Adjacent(UB,MB) ∧ Adjacent(LB,LF) ∧ Adjacent(UF,UB) ∧ Adjacent(UF,BUFF) ∧ Adjacent(MF,UF) ∧ Adjacent(LF,MF) ∧ Adjacent(MB,LB) ∧ Adjacent(MB,UB) ∧ Adjacent(LF,LB)
 - the agent starts off at BUFF: At(agent,BUFF)
 - there is a plate at BUFF: At(plate,BUFF)
 - there is a single customer at LB: At(customer,LB)
@@ -30,21 +35,21 @@ Actions (15%)
 Action: PickUp
 Parameters: ?p - plate ?loc - location
 Description: The agent can pick up a plate
-Precondition: ¬Holding(p) ∧ ¬HasFood(p) ∧ At(agent,loc) ∧ At(p,loc)
-Effect: Holding(p)
+Precondition: ¬Holding(p) ∧ ¬HasFood(p) ∧ At(agent,loc) ∧ At(p,loc) ∧ ¬IsHolding(agent)
+Effect: Holding(p) ∧ IsHolding(agent)
 
 1.7: The agent can Hand Over a plate of food to a customer that is in the same location as the agent, after which a customer should be said to be Served.
 Action: HandOver
 Parameters: ?p - plate ?loc - location ?c - customer
 Description: The agent hand over a plate p to a customer c at location loc
-Precondition: At(c,loc) ∧ At(agent,loc) ∧ Holding(p) ∧ HasFood(p) ∧ ¬IsServed(c)
-Effect: ¬Holding(p) ∧ IsServed(c)
+Precondition: At(c,loc) ∧ At(agent,loc) ∧ Holding(p) ∧ HasFood(p) ∧ ¬IsServed(c) ∧ IsHolding(agent)
+Effect: ¬Holding(p) ∧ IsServed(c) ∧ ¬IsHolding(agent)
 
 1.8: At the BUFF, the agent can Fill a plate with food that it is Holding if the plate does not already Have Food.
 Action: Fill
 Parameters: ?p - plate 
 Description: The agent fills plate p with food 
-Precondition: At(agent,BUFF) ∧ ¬HasFood(p) ∧ Holding(p)
+Precondition: At(agent,BUFF) ∧ ¬HasFood(p) ∧ Holding(p) ∧ IsHolding(agent)
 Effect: HasFood(p)
 
 1.9: The agent can Move from its current location to an Adjacent one.
@@ -61,7 +66,7 @@ Backward State Space Search (15%)
 
 Formalize the following initial and goal states using the predicates you developed in the previous sections
 - Initial State: The agent is at BUFF, there is one empty plate P at the BUFF, and there is a customer C who hasn't yet been served at UF.
-	At(agent,BUFF) ∧ At(P,BUFF) ∧ ¬HasFood(P) ∧ At(C,UF) ∧ ¬IsServed(C) ∧ ¬Holding(P) ∧ Adjacent(BUFF,UF)
+	At(agent,BUFF) ∧ At(P,BUFF) ∧ ¬HasFood(P) ∧ At(C,UF) ∧ ¬IsServed(C) ∧ ¬Holding(P) ∧ ¬IsHolding(agent) ∧ Adjacent(BUFF,UF)
 - Goal State: The customer C has been served.
 	IsServed(C)
 
@@ -71,33 +76,65 @@ Show in your working:
 - The current updated goal state at each stage of the search
 - The final plan executed
 
--- Forward: PickUp, Fill, Move, HandOver
-
 Goal State: IsServed(C)
 
-1.	Action: HandOver(C,UF)
-	Precondition: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
-	Effect: ¬Holding(P) ∧ IsServed(C)
-	UpdatedGoal: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
+1.	Action: HandOver(P,UF,C)
+	Precondition: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ IsHolding(agent) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
+	Effect: ¬Holding(P) ∧ ¬IsHolding(agent) ∧ IsServed(C)
+	UpdatedGoal: At(C,UF) ∧ At(agent,UF) ∧ Holding(P) ∧ IsHolding(agent) ∧ HasFood(P) ∧ ¬IsServed(C) ∧ ¬At(agent,BUFF)
 
 2.	Action: Move(BUFF,UF)
 	Precondition: At(agent,BUFF) ∧ Adjacent(BUFF,UF)
 	Effect: At(agent,UF) ∧ ¬At(agent,BUFF)
-	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ HasFood(P) ∧ ¬IsServed(C)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ IsHolding(agent) ∧ HasFood(P) ∧ ¬IsServed(C)
 
 3.	Action: Fill(P)
-	Precondition: At(agent,BUFF) ∧ ¬HasFood(P) ∧ Holding(P) ∧ At(P,BUFF)
+	Precondition: At(agent,BUFF) ∧ ¬HasFood(P) ∧ Holding(P) ∧ IsHolding(agent) ∧ At(P,BUFF)
 	Effect: HasFood(P)
-	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ Holding(P) ∧ IsHolding(agent) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
 
-4.	Action: PickUp(P)
-	Precondition: ¬Holding(P) ∧ ¬HasFood(P) ∧ At(agent,BUFF) ∧ At(P,BUFF)
-	Effect: Holding(P)
-	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ ¬Holding(P) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
+4.	Action: PickUp(P,BUFF)
+	Precondition: ¬Holding(P) ∧ ¬IsHolding(agent) ∧ ¬HasFood(P) ∧ At(agent,BUFF) ∧ At(P,BUFF)
+	Effect: Holding(P) ∧ IsHolding(agent)
+	UpdatedGoal: At(C,UF) ∧ At(agent,BUFF) ∧ Adjacent(BUFF,UF) ∧ ¬Holding(P) ∧ ¬IsHolding(agent) ∧ ¬HasFood(P) ∧ At(P,BUFF) ∧ ¬IsServed(C)
 
-	
+
+Final Plan
+1. PickUp(P,BUFF)
+2. Fill(P)
+3. Move(BUFF,UF)
+4. HandOver(P,UF,C)
+
+
+
+-------------------------------
 
 Part 4:
-4.1
-4.2
+
+Imagine that the restaurant starts making food to order from a limited menu. They do hot tea and coffee, a dessert with ice-cream, and sushi. Now the agent must not only ensure that all customers are served, but must also ensure that these items are served in a timely fashion. In particular, if left too long the tea and coffee will go cold and the ice-cream will melt. The sushi is largely unaffected by time.
+
+4.1: How would the goals and actions need to be updated to deal with these new constraints? You do not need to implement your suggestions.
+We are dealing with a case where the customer is able to make multiple orders. Therefore, it would be useful to have a list of orders as a new type. 
+To be able to fill the list of orders appropriately, we would need a new action that would take down the customer's order(s) and store it in the list.
+We would also have to deal with the fact that some of the orders are time-dependent, such as the tea, coffee, and ice-cream, and sushi is not. Hence, we would need a predicate that would check whether or not a particular item is time-dependent, for example (TimeDependent ?x - item) will return TRUE when x is tea, coffee, or ice-cream and will return FALSE when x is sushi. Having this predicate will help the agent decide which order to complete first and prioritise the ones that are time-dependent. This will ensure that none of the items would be spoiled by the time it is served.
+It would also be useful if the predicate TimeDependent can sort the list of orders based on urgency, moving the time-dependent ones on top of the list.
+
+In this planning problem the robot has to meet the needs of multiple customers. In reality this would create a number of social expectations, for example, customers expect to be served on a first-come first-served basis. Ideally our robot waiter would be able to deal with these expectations.
+
+4.2: How would the additional consideration of meeting social expectations change your answers to [4.1]? How might you go about implementing a system which could deal with this problem? Think in particular about what actions would be required, what the planner would need to keep track of, and how you would evaluate how well the agent is doing.
+Since we will be dealing with more than one customer, we would need a list of list of orders, i.e. AllOrders = [[Cust1Orders], [Cust2Orders], ...]. 
+Adding an action such as AddCustomer will help sort the AllOrders list based on which customer orders first, and achieve the first-come-first-served expectation.
+We also need to take into account the time dependency of the orders, so we would need to sort each individual orders. 
+	e.g [[Ice-cream, sushi], [Ice-cream, tea, sushi]] sort the individual orders, but start serving based on which customer ordered first.
+To make sure that the next customer's orders aren't spoiled, it would be useful to keep track of which customers are already served. This will make it possible to not start making the next customer's order if the previous customer has not been served completely. This way we can preserve the first-come-first-served basis as well as prevent customers from having melted ice-cream or cold tea/coffee.
+	e.g. modify the IsServed predicate to check the current and previous customer, or add a new predicate like PrevCustServed that yields TRUE if and only if IsServed is true for the previous customer.
+Another social expectation that we need to take into account is serving the orders based on its type, such as main course, dessert, and drink. For customers who ordered both ice-cream and sushi, they would expect to be served the sushi first and the ice-cream later, despite the ice-cream being time-dependent. The customer might also expect to be served both their food and drinks at once. A few things that could help fulfill this expectation are the predicates (MainCourse ?x - item), (Drink ?x - item), and (Dessert ?x - item) and the actions ServeMain, ServeDrink, and ServeDessert so that the orders can be served accordingly.
+We can also measure a few things to gauge how well the agent is doing, such as:
+- Number of customers served at a given time interval
+	- Compare the actual number with the pre-set expected number of customers served
+- The time difference between when a customer's order is placed and when the customer is served
+	- If the time difference is way too long, this means that the agent is unable to proecss the customer's orders efficiently and will result to a dissatisfied customer
+- The percentage of orders that are spoilt upon delivery
+	- This could be done by using new predicates such as (HasMelted ?icecream - item) or (HasGoneCold ?drink - item)
+
 
